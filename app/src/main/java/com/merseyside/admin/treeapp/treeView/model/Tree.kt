@@ -9,11 +9,14 @@ import kotlin.collections.ArrayList
 
 class Tree<T> {
 
+    val count: Int
+        get() {
+            return nodeMap.size
+        }
+
     private val nodeMap: MutableMap<Id, Node<T>> = HashMap()
 
     private var roots: MutableList<Node<T>> = ArrayList()
-
-    private var idCounter = 0
 
     private fun isExists(node: Node<T>?): Boolean {
         return nodeMap.containsKey(node?.id ?: return false)
@@ -21,14 +24,14 @@ class Tree<T> {
 
     fun addValue(value: T, parent: Node<T>? = getFirstRoot()): Node<T> {
 
-        val parentId = parent?.id ?: -1
+        val parentId = parent?.id ?: 0
 
-        val node = Node(++idCounter, value, parentId)
+        val node = Node(value, parentId)
 
         if (!isRootExists()) {
             addRoot(node)
         } else {
-            parent?.addChild(idCounter) ?: getFirstRoot()!!.addChild(idCounter)
+            parent?.addChild(node.id) ?: getFirstRoot()!!.addChild(node.id)
         }
 
         addNodeToCollection(node)
@@ -41,8 +44,6 @@ class Tree<T> {
             if (!isRootExists()) {
                 addRoot(node)
             } else {
-                addNodeToCollection(node)
-
                 var isAlreadyRoot = false
 
                 roots = roots
@@ -67,14 +68,21 @@ class Tree<T> {
                 }
             }
 
-            if (node.isNotDeleted()) {
-                getById(node.getParent())?.let {
-                    if (!it.isNotDeleted()) {
+            addNodeToCollection(node)
 
-                        deleteNode(node)
-                    }
+            checkNodeForDeletion(node)
+        }
+    }
+
+    private fun checkNodeForDeletion(node: Node<T>) {
+        if (node.isNotDeleted()) {
+            getById(node.getParent())?.let {
+                if (!it.isNotDeleted()) {
+                    deleteNode(node)
                 }
             }
+        } else {
+            deleteNode(node)
         }
     }
 
@@ -108,19 +116,12 @@ class Tree<T> {
         }
     }
 
-    fun getById(id: Id): Node<T>? {
-        return nodeMap[id]
-    }
-
-    fun getById(ids: List<Id>) = ids.mapNotNull { id -> getById(id) }
+    private fun getById(id: Id) = nodeMap[id]
 
     @Throws(IllegalArgumentException::class)
     private fun update(node: Node<T>) {
-        //if (isContains(node.id)) {
-            nodeMap[node.id] = node
-        //} else {
-//            addNode
-//        }
+        addNodeToCollection(node)
+        checkNodeForDeletion(node)
     }
 
     @Throws(IllegalArgumentException::class)
@@ -130,18 +131,11 @@ class Tree<T> {
         }
     }
 
-    private fun isContains(id: Id): Boolean {
-        return nodeMap.containsKey(id)
-    }
-
     fun clear() {
-        idCounter = 0
+        Log.d(TAG, "clear")
+
         roots.clear()
         nodeMap.clear()
-    }
-
-    fun count(): Int {
-        return nodeMap.size
     }
 
     fun printTree() {
@@ -160,7 +154,7 @@ class Tree<T> {
 
                 strBuilder.append(node.value)
 
-                System.out.println(strBuilder.toString())
+                println(strBuilder.toString())
 
                 node.getChildren().forEach { nodeId ->
                     printTree(nodeId, level + 1)
@@ -192,12 +186,12 @@ class Tree<T> {
             toListWithLevel(root.id, 0)
         }
 
-        return list.also { System.out.println("count = ${list.count()}") }
+        return list
     }
 
-    fun isEmpty() = count() == 0
+    fun isEmpty() = count == 0
 
-    fun toList() = nodeMap.values.toMutableList()
+    private fun toList() = nodeMap.values.toMutableList()
 
     companion object {
         private const val TAG = "Tree"

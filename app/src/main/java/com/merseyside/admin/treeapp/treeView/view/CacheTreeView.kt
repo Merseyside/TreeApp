@@ -4,19 +4,21 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import com.merseyside.admin.treeapp.treeView.model.Node
+import com.merseyside.admin.treeapp.treeView.model.Tree
 
 class CacheTreeView<T>(context: Context, attributeSet: AttributeSet): TreeView<T>(context, attributeSet) {
 
+    init {
+        tree = Tree()
+    }
 
-    fun addNode(node: Node<T>) {
-        tree.addNode(node)
+    fun addValue(value: T, node: Node<T>) {
+        tree.addValue(value, node)
 
         setTree()
     }
 
     fun addNodes(nodes: List<Node<T>>) {
-        Log.d(TAG, "count = ${nodes.size}")
-
         nodes.forEach {node ->
             tree.addNode(node)
         }
@@ -30,11 +32,6 @@ class CacheTreeView<T>(context: Context, attributeSet: AttributeSet): TreeView<T
         }
 
         setTree()
-    }
-
-    private fun setTree() {
-        adapter.removeAll()
-        adapter.setTree(tree)
     }
 
     companion object {

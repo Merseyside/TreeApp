@@ -1,16 +1,21 @@
 package com.merseyside.admin.treeapp.treeView
 
 import android.content.Context
+import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.merseyside.admin.treeapp.R
 import com.merseyside.admin.treeapp.treeView.model.Tree
 import com.merseyside.admin.treeapp.treeView.view.CacheTreeView
 import com.merseyside.admin.treeapp.treeView.view.DbTreeView
+import com.merseyside.admin.treeapp.treeView.view.EditDialog
 import com.merseyside.admin.treeapp.treeView.view.TreeView
+import kotlinx.android.synthetic.main.view_tree.view.*
 import kotlinx.android.synthetic.main.view_tree_cache.view.*
 
 class StorageCacheView<T>(
@@ -20,12 +25,6 @@ class StorageCacheView<T>(
 
     private lateinit var cacheView: CacheTreeView<T>
     private lateinit var storageView: DbTreeView<T>
-
-    private lateinit var addButton: ImageButton
-    private lateinit var removeButton: ImageButton
-    private lateinit var toCacheButton: ImageButton
-    private lateinit var clearButton: ImageButton
-    private lateinit var applyButton: ImageButton
 
     init {
         loadAttrs()
@@ -42,20 +41,11 @@ class StorageCacheView<T>(
         cacheView = findViewById(R.id.cache)
         storageView = findViewById(R.id.storage)
 
-        addButton = findViewById(R.id.add)
-        addButton.setOnClickListener(this)
-
-        removeButton = findViewById(R.id.remove)
-        removeButton.setOnClickListener(this)
-
-        toCacheButton = findViewById(R.id.to_cache_button)
-        toCacheButton.setOnClickListener(this)
-
-        clearButton = findViewById(R.id.clear)
-        clearButton.setOnClickListener(this)
-
-        applyButton = findViewById(R.id.apply)
-        applyButton.setOnClickListener(this)
+        add.setOnClickListener(this)
+        remove.setOnClickListener(this)
+        to_cache.setOnClickListener(this)
+        clear.setOnClickListener(this)
+        apply.setOnClickListener(this)
 
     }
 
@@ -67,13 +57,24 @@ class StorageCacheView<T>(
         if (view != null) {
             when (view.id) {
                 R.id.add -> {
+                    val nodes = cacheView.getSelectedNodes()
 
+                    if (nodes.size == 1) {
+                        showEditDialog(
+                            value = "",
+                            callback = {value ->
+                                cacheView.addValue(value as T, nodes.first())
+                            }
+                        )
+                    } else {
+                        Toast.makeText(context, context.getString(R.string.add_message), Toast.LENGTH_SHORT).show()
+                    }
                 }
                 R.id.remove -> {
                     cacheView.deleteNodes()
 
                 }
-                R.id.to_cache_button -> {
+                R.id.to_cache -> {
                     cacheView.addNodes(storageView.getSelectedNodes().map { it.copy() })
                     storageView.cleanSelection()
                 }
@@ -81,10 +82,28 @@ class StorageCacheView<T>(
                     cacheView.clean()
                 }
                 R.id.apply -> {
+                    if (!cacheView.tree.isEmpty()) {
+                        storageView.updateData(cacheView.tree)
 
+                        cacheView.clean()
+                    }
                 }
             }
-
         }
+    }
+
+    private fun showEditDialog(callback: (value: String) -> Unit, value: String? = null) {
+        val dialog = EditDialog()
+
+        if (value != null) {
+            val bundle = Bundle()
+            bundle.putString(EditDialog.VALUE_KEY, value)
+
+            dialog.arguments = bundle
+        }
+
+        dialog.show((context as AppCompatActivity).supportFragmentManager, "edit_tag")
+
+        dialog.setOnSaveListener(callback)
     }
 }

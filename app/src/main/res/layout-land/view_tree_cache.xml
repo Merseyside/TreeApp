@@ -34,7 +34,9 @@
                 android:background="@color/transparent"
                 android:minWidth="0dp"
                 app:srcCompat="@drawable/ic_add"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                android:foreground="?attr/selectableItemBackground"
+                />
 
             <ImageButton
                 android:id="@+id/remove"
@@ -43,7 +45,8 @@
                 android:background="@color/transparent"
                 android:minWidth="0dp"
                 app:srcCompat="@drawable/ic_remove"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                android:foreground="?attr/selectableItemBackground"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -57,7 +60,8 @@
                     android:background="@color/transparent"
                     android:minWidth="0dp"
                     app:srcCompat="@drawable/ic_apply"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription"
+                    android:foreground="?attr/selectableItemBackground"/>
 
                 <ImageButton
                     android:id="@+id/clear"
@@ -66,7 +70,8 @@
                     android:background="@color/transparent"
                     android:minWidth="0dp"
                     app:srcCompat="@drawable/ic_clear"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription"
+                    android:foreground="?attr/selectableItemBackground"/>
 
             </LinearLayout>
 
@@ -82,12 +87,13 @@
             android:gravity="center">
 
         <ImageButton
-                android:id="@+id/to_cache_button"
+                android:id="@+id/to_cache"
                 android:layout_width="@dimen/icon_size"
                 android:layout_height="@dimen/icon_size"
                 android:background="@color/transparent"
                 app:srcCompat="@drawable/ic_left"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                android:foreground="?attr/selectableItemBackground"/>
 
     </LinearLayout>
 

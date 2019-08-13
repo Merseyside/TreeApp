@@ -1,13 +1,11 @@
 package com.merseyside.admin.treeapp.treeView.model
 
 import Level
-import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.databinding.Bindable
 import com.merseyside.admin.treeapp.BR
 import com.merseyside.admin.treeapp.R
 import com.upstream.basemvvmimpl.presentation.model.BaseAdapterViewModel
-import java.lang.StringBuilder
 
 class NodeItemViewModel<T>(private var node: Pair<Node<T>, Level>) : BaseAdapterViewModel<Pair<Node<T>, Level>>() {
 
@@ -38,7 +36,9 @@ class NodeItemViewModel<T>(private var node: Pair<Node<T>, Level>) : BaseAdapter
     }
 
     fun onClick() {
-        isSelected = !isSelected
+        if (node.first.isNotDeleted()) {
+            isSelected = !isSelected
+        }
     }
 
     @Bindable

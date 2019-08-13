@@ -13,13 +13,12 @@ import com.merseyside.admin.treeapp.treeView.model.Tree
 abstract class TreeView<T>(context: Context, attributeSet: AttributeSet) : LinearLayout(context, attributeSet) {
 
     protected val adapter: TreeAdapter<T>
-    protected var tree = Tree<T>()
+
+    lateinit var tree: Tree<T>
 
     init {
         loadAttrs()
-
         adapter = TreeAdapter()
-
         doLayout()
     }
 
@@ -42,5 +41,10 @@ abstract class TreeView<T>(context: Context, attributeSet: AttributeSet) : Linea
 
     fun cleanSelection() {
         adapter.cleanSelection()
+    }
+
+    protected fun setTree() {
+        adapter.removeAll()
+        adapter.setTree(tree)
     }
 }
