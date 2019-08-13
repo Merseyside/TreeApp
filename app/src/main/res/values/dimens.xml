@@ -13,4 +13,6 @@
     <dimen name="medium_text_size">18sp</dimen>
     <dimen name="large_text_size">28sp</dimen>
     <dimen name="very_large_text_size">36sp</dimen>
+
+    <dimen name="icon_size">36dp</dimen>
 </resources>

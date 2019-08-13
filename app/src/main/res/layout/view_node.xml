@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="obj"
+            type="com.merseyside.admin.treeapp.treeView.model.NodeItemViewModel" />
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:onClick="@{view -> obj.onClick()}"
+        bind:colorBackground="@{obj.nodeBackground}">
+
+        <TextView
+            android:id="@+id/value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="@color/black"
+            android:text="@{obj.value}"/>
+
+    </LinearLayout>
+</layout>

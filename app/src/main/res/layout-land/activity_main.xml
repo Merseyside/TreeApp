@@ -9,6 +9,7 @@
         tools:ignore="MissingDefaultResource">
 
     <com.merseyside.admin.treeapp.treeView.StorageCacheView
+            android:id="@+id/storageCacheView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="Hello World!"

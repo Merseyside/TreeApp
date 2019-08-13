@@ -2,6 +2,7 @@ package com.merseyside.admin.treeapp.treeView.model
 
 import Id
 import Level
+import android.util.Log
 import java.lang.StringBuilder
 import java.util.*
 import kotlin.collections.ArrayList
@@ -10,17 +11,24 @@ class Tree<T> {
 
     private val nodeMap: MutableMap<Id, Node<T>> = HashMap()
 
-    var roots: MutableList<Node<T>> = ArrayList()
+    private var roots: MutableList<Node<T>> = ArrayList()
 
     private var idCounter = 0
 
-    fun addValue(value: T, parent: Node<T>? = roots.firstOrNull()): Node<T> {
-        val node = Node(++idCounter, value)
+    private fun isExists(node: Node<T>?): Boolean {
+        return nodeMap.containsKey(node?.id ?: return false)
+    }
+
+    fun addValue(value: T, parent: Node<T>? = getFirstRoot()): Node<T> {
+
+        val parentId = parent?.id ?: -1
+
+        val node = Node(++idCounter, value, parentId)
 
         if (!isRootExists()) {
             addRoot(node)
         } else {
-            parent?.addChild(idCounter) ?: getFirstRoot().addChild(idCounter)
+            parent?.addChild(idCounter) ?: getFirstRoot()!!.addChild(idCounter)
         }
 
         addNodeToCollection(node)
@@ -29,27 +37,55 @@ class Tree<T> {
     }
 
     fun addNode(node: Node<T>) {
-        if (!isRootExists()) {
-            addRoot(node)
-        } else {
-            val isFound = nodeMap
-                    .asSequence()
-                    .filter { entry -> entry.value.getChildren().contains(node.id) }
-                    .take(1)
-                    .map { true }
-                    .firstOrNull() ?: false
-
-            roots = roots
-                    .filterNot { root ->
-                        node.getChildren().contains(root.id)
-                    }.toMutableList()
-
-            if (!isFound) {
+        if (!isExists(node)) {
+            if (!isRootExists()) {
                 addRoot(node)
+            } else {
+                addNodeToCollection(node)
+
+                var isAlreadyRoot = false
+
+                roots = roots
+                        .asSequence()
+                        .filterNot { root ->
+                            node.getChildren().contains(root.id).also {
+                                if (!isAlreadyRoot) {
+                                    isAlreadyRoot = root.id == node.id
+                                }
+                            }
+                        }.toMutableList()
+
+                val isChild = nodeMap
+                        .asSequence()
+                        .filter { entry -> entry.value.getChildren().contains(node.id) }
+                        .take(1)
+                        .map { true }
+                        .firstOrNull() ?: false
+
+                if (!isChild && !isAlreadyRoot) {
+                    addRoot(node)
+                }
+            }
+
+            if (node.isNotDeleted()) {
+                getById(node.getParent())?.let {
+                    if (!it.isNotDeleted()) {
+
+                        deleteNode(node)
+                    }
+                }
             }
         }
+    }
 
-        addNodeToCollection(node)
+    fun deleteNode(node: Node<T>?) {
+        if (isExists(node)) {
+            node!!.delete()
+
+            node.getChildren().forEach {
+                deleteNode(nodeMap[it])
+            }
+        }
     }
 
     private fun addNodeToCollection(node: Node<T>) {
@@ -64,25 +100,11 @@ class Tree<T> {
         roots.add(node)
     }
 
-    private fun removeRoot(node: Node<T>) {
-        roots.remove(node)
-    }
-
-    private fun isNodeIdInRoots(id: Id): Boolean {
-        roots.forEach { node ->
-            if (node.id == id) {
-                return true
-            }
-        }
-
-        return false
-    }
-
-    private fun getFirstRoot(): Node<T> {
-        if (roots.isNotEmpty()) {
-            return roots.first()
+    private fun getFirstRoot(): Node<T>? {
+        return if (roots.isNotEmpty()) {
+            roots.first()
         } else {
-            throw IllegalStateException("Roots are empty")
+            null
         }
     }
 
@@ -93,17 +115,17 @@ class Tree<T> {
     fun getById(ids: List<Id>) = ids.mapNotNull { id -> getById(id) }
 
     @Throws(IllegalArgumentException::class)
-    fun update(node: Node<T>) {
-        if (isContains(node.id)) {
+    private fun update(node: Node<T>) {
+        //if (isContains(node.id)) {
             nodeMap[node.id] = node
-        } else {
-            throw IllegalArgumentException("No node found with passed id")
-        }
+        //} else {
+//            addNode
+//        }
     }
 
     @Throws(IllegalArgumentException::class)
-    fun update(map: List<Node<T>>) {
-        map.forEach { node ->
+    fun update(tree: Tree<T>) {
+        tree.toList().forEach { node ->
             update(node)
         }
     }
@@ -151,26 +173,34 @@ class Tree<T> {
         }
     }
 
-    fun toList(): List<Pair<Node<T>, Level>> {
+    fun toListWithLevel(): List<Pair<Node<T>, Level>> {
         val list = ArrayList<Pair<Node<T>, Level>>()
 
-        fun toList(id: Id, level: Level) {
+        fun toListWithLevel(id: Id, level: Level) {
             val node = getById(id)
 
             if (node != null) {
                 list.add(node to level)
 
                 node.getChildren().forEach { nodeId ->
-                    toList(nodeId, level + 1)
+                    toListWithLevel(nodeId, level + 1)
                 }
             }
         }
 
         roots.forEach { root ->
-            toList(root.id, 0)
+            toListWithLevel(root.id, 0)
         }
 
-        return list
+        return list.also { System.out.println("count = ${list.count()}") }
+    }
+
+    fun isEmpty() = count() == 0
+
+    fun toList() = nodeMap.values.toMutableList()
+
+    companion object {
+        private const val TAG = "Tree"
     }
 }
 

@@ -1,4 +1,4 @@
-package com.merseyside.admin.treeapp.treeView
+package com.merseyside.admin.treeapp.treeView.view
 
 import android.content.Context
 import android.util.AttributeSet
@@ -7,11 +7,13 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.merseyside.admin.treeapp.R
 import com.merseyside.admin.treeapp.treeView.adapter.TreeAdapter
+import com.merseyside.admin.treeapp.treeView.model.Node
 import com.merseyside.admin.treeapp.treeView.model.Tree
 
-class TreeView(context: Context, attributeSet: AttributeSet) : LinearLayout(context, attributeSet) {
+abstract class TreeView<T>(context: Context, attributeSet: AttributeSet) : LinearLayout(context, attributeSet) {
 
-    private val adapter: TreeAdapter
+    protected val adapter: TreeAdapter<T>
+    protected var tree = Tree<T>()
 
     init {
         loadAttrs()
@@ -21,9 +23,7 @@ class TreeView(context: Context, attributeSet: AttributeSet) : LinearLayout(cont
         doLayout()
     }
 
-    private fun loadAttrs() {
-
-    }
+    private fun loadAttrs() {}
 
     private fun doLayout() {
         LayoutInflater.from(context).inflate(R.layout.view_tree, this)
@@ -31,9 +31,16 @@ class TreeView(context: Context, attributeSet: AttributeSet) : LinearLayout(cont
         findViewById<RecyclerView>(R.id.tree).adapter = adapter
     }
 
-    fun setData(tree: Tree<String>) {
-        adapter.add(tree.toList())
+    fun getSelectedNodes(): List<Node<T>> {
+        return adapter.getSelectedNodes()
     }
 
+    fun clean() {
+        tree.clear()
+        adapter.removeAll()
+    }
 
+    fun cleanSelection() {
+        adapter.cleanSelection()
+    }
 }
