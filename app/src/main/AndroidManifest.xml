@@ -9,6 +9,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             tools:ignore="GoogleAppIndexingWarning">
         <activity
                 android:name=".MainActivity"

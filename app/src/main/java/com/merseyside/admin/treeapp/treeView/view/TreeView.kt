@@ -43,6 +43,12 @@ abstract class TreeView<T>(context: Context, attributeSet: AttributeSet) : Linea
         adapter.cleanSelection()
     }
 
+    fun updateNode(node: Node<T>) {
+        tree.update(node)
+
+        setTree()
+    }
+
     protected fun setTree() {
         adapter.removeAll()
         adapter.setTree(tree)

@@ -46,6 +46,7 @@ class StorageCacheView<T>(
         to_cache.setOnClickListener(this)
         clear.setOnClickListener(this)
         apply.setOnClickListener(this)
+        edit.setOnClickListener(this)
 
     }
 
@@ -86,6 +87,23 @@ class StorageCacheView<T>(
                         storageView.updateData(cacheView.tree)
 
                         cacheView.clean()
+                    }
+                }
+                R.id.edit -> {
+                    val nodes = cacheView.getSelectedNodes()
+
+                    if (nodes.size == 1) {
+                        nodes.first().let {
+                            showEditDialog(
+                                    value = it.value.toString(),
+                                    callback = { value ->
+                                        it.value = value as T
+                                        cacheView.updateNode(it)
+                                    })
+                        }
+
+                    } else {
+                        Toast.makeText(context, context.getString(R.string.edit_message), Toast.LENGTH_SHORT).show()
                     }
                 }
             }

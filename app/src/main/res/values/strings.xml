@@ -4,4 +4,5 @@
     <string name="hint_edit_dialog">Put node value</string>
     <string name="save">Save</string>
     <string name="add_message">You can add only to one node</string>
+    <string name="edit_message">You can edit only one node</string>
 </resources>

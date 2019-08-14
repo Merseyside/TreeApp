@@ -2,8 +2,6 @@ package com.merseyside.admin.treeapp.treeView.model
 
 import Id
 import Level
-import android.util.Log
-import java.lang.StringBuilder
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -119,7 +117,7 @@ class Tree<T> {
     private fun getById(id: Id) = nodeMap[id]
 
     @Throws(IllegalArgumentException::class)
-    private fun update(node: Node<T>) {
+    fun update(node: Node<T>) {
         addNodeToCollection(node)
         checkNodeForDeletion(node)
     }
@@ -132,8 +130,6 @@ class Tree<T> {
     }
 
     fun clear() {
-        Log.d(TAG, "clear")
-
         roots.clear()
         nodeMap.clear()
     }
