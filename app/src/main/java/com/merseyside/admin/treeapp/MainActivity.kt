@@ -17,10 +17,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         storageCacheView = findViewById(R.id.storageCacheView)
+        storageCacheView.setOnResetListener(object: StorageCacheView.OnResetListener {
+            override fun onReset() {
+                storageCacheView.setData(generateData())
+            }
 
-        val tree = generateData()
+        })
 
-        storageCacheView.setData(tree)
+        storageCacheView.setData(generateData())
     }
 
     private fun generateData(): Tree<String> {

@@ -76,7 +76,7 @@
                     android:foreground="?attr/selectableItemBackground"/>
 
                 <ImageButton
-                    android:id="@+id/clear"
+                    android:id="@+id/reset"
                     android:layout_width="@dimen/icon_size"
                     android:layout_height="@dimen/icon_size"
                     android:background="@color/transparent"

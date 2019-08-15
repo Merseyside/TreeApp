@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -14,8 +13,6 @@ import com.merseyside.admin.treeapp.treeView.model.Tree
 import com.merseyside.admin.treeapp.treeView.view.CacheTreeView
 import com.merseyside.admin.treeapp.treeView.view.DbTreeView
 import com.merseyside.admin.treeapp.treeView.view.EditDialog
-import com.merseyside.admin.treeapp.treeView.view.TreeView
-import kotlinx.android.synthetic.main.view_tree.view.*
 import kotlinx.android.synthetic.main.view_tree_cache.view.*
 
 class StorageCacheView<T>(
@@ -23,12 +20,21 @@ class StorageCacheView<T>(
         attributeSet: AttributeSet
 ) : LinearLayout(context, attributeSet), View.OnClickListener {
 
+    interface OnResetListener {
+        fun onReset()
+    }
+
     private lateinit var cacheView: CacheTreeView<T>
     private lateinit var storageView: DbTreeView<T>
+    private var onResetListener: OnResetListener? = null
 
     init {
         loadAttrs()
         doLayout()
+    }
+
+    fun setOnResetListener(listener: OnResetListener) {
+        this.onResetListener = listener
     }
 
     private fun loadAttrs() {
@@ -44,7 +50,7 @@ class StorageCacheView<T>(
         add.setOnClickListener(this)
         remove.setOnClickListener(this)
         to_cache.setOnClickListener(this)
-        clear.setOnClickListener(this)
+        reset.setOnClickListener(this)
         apply.setOnClickListener(this)
         edit.setOnClickListener(this)
 
@@ -79,8 +85,11 @@ class StorageCacheView<T>(
                     cacheView.addNodes(storageView.getSelectedNodes().map { it.copy() })
                     storageView.cleanSelection()
                 }
-                R.id.clear -> {
+                R.id.reset -> {
+                    storageView.clean()
                     cacheView.clean()
+
+                    onResetListener?.onReset()
                 }
                 R.id.apply -> {
                     if (!cacheView.tree.isEmpty()) {
