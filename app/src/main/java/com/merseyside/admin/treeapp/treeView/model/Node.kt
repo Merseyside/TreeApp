@@ -18,8 +18,10 @@ data class Node<T>(
 
     internal fun getChildren() = childList
 
-    internal fun delete() {
+    internal fun delete(): Node<T> {
         isDeleted = true
+
+        return this
     }
 
     internal fun getParent(): Id {

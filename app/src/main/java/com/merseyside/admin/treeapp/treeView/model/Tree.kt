@@ -72,29 +72,46 @@ class Tree<T> {
         }
     }
 
-    private fun checkNodeForDeletion(node: Node<T>) {
+    private fun checkNodeForDeletion(node: Node<T>): List<Node<T>>? {
         if (node.isNotDeleted()) {
             getById(node.getParent())?.let {
                 if (!it.isNotDeleted()) {
-                    deleteNode(node)
+                    return deleteNode(node)
                 }
             }
         } else {
-            deleteNode(node)
+            return deleteNode(node)
         }
+
+        return null
     }
 
-    fun deleteNode(node: Node<T>?) {
+    fun deleteNode(node: Node<T>?): List<Node<T>>? {
+
         if (isExists(node)) {
-            node!!.delete()
+            val deletedNodes = ArrayList<Node<T>>()
+
+            deletedNodes.add(node!!.delete())
 
             node.getChildren().forEach {
-                deleteNode(nodeMap[it])
+                val delNodes = deleteNode(nodeMap[it])
+
+                if (delNodes != null) {
+                    deletedNodes.addAll(delNodes)
+                }
             }
+
+            return deletedNodes
         }
+
+        return null
     }
 
-    private fun addNodeToCollection(node: Node<T>) {
+    private fun addNodeToCollection(node: Node<T>, isWithoutAdd: Boolean = false) {
+        if (nodeMap.containsKey(node.id)) {
+            if (!nodeMap[node.id]!!.isNotDeleted()) return
+        } else if (isWithoutAdd) return
+
         nodeMap[node.id] = node
     }
 
@@ -117,16 +134,27 @@ class Tree<T> {
     private fun getById(id: Id) = nodeMap[id]
 
     @Throws(IllegalArgumentException::class)
-    fun update(node: Node<T>) {
-        addNodeToCollection(node)
-        checkNodeForDeletion(node)
+    fun update(node: Node<T>, isWithoutAdd: Boolean = false): List<Node<T>>? {
+        addNodeToCollection(node, isWithoutAdd)
+        return checkNodeForDeletion(node)
     }
 
     @Throws(IllegalArgumentException::class)
-    fun update(tree: Tree<T>) {
-        tree.toList().forEach { node ->
-            update(node)
+    fun update(nodeList: List<Node<T>>, isWithoutAdd: Boolean = false): List<Node<T>> {
+        val list = ArrayList<Node<T>>()
+
+        nodeList.forEach { node ->
+            val changedNodes = update(node.copy(), isWithoutAdd)
+            if (changedNodes != null) {
+                list.addAll(changedNodes)
+            }
         }
+
+        return list
+    }
+
+    fun updateWithoutAdd(nodeList: List<Node<T>>) {
+        update(nodeList, true)
     }
 
     fun clear() {
@@ -187,7 +215,7 @@ class Tree<T> {
 
     fun isEmpty() = count == 0
 
-    private fun toList() = nodeMap.values.toMutableList()
+    fun toList() = nodeMap.values.toMutableList()
 
     companion object {
         private const val TAG = "Tree"

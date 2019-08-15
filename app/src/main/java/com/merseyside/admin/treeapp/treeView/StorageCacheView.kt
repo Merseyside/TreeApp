@@ -93,9 +93,7 @@ class StorageCacheView<T>(
                 }
                 R.id.apply -> {
                     if (!cacheView.tree.isEmpty()) {
-                        storageView.updateData(cacheView.tree)
-
-                        cacheView.clean()
+                        cacheView.update(storageView.updateData(cacheView.tree))
                     }
                 }
                 R.id.edit -> {
